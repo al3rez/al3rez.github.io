@@ -10,7 +10,6 @@ When dealing with databases sometimes working with a ORM/ODM is a pain in the as
 ## Code Generation
 
 
-
 ```go
 // gen_basic.tpl
 // Code generated DO NOT EDIT
@@ -111,8 +110,11 @@ rm -f ${PACK}_gen.go || true
 cat ${FILE} | sed -e s#VAR_TYPE#${T^}#g -e ${PATTERN} > ${PACK}_gen.go
 
 ```
-
 You can change the above script based on your needs and it should work fine.
+
+## ⭐️ Reference
+If you want to know more about `//go:generate` command and how it works please check out [the official documentation](https://blog.golang.org/generate).
+
 
 ----------------
 I hope you enjoyed this post! If you want to start a new project or you want to
