@@ -1,0 +1,91 @@
+---
+layout: default
+---
+
+		<script>
+			window.onload = function() {
+			var s=document.querySelectorAll('main p');
+			for(i=0;i<s.length;i++)
+			{
+							console.log(s);
+							    s[i].setAttribute("class","font-serif text-xl my-4");
+						}
+			var c=document.querySelectorAll('main pre');
+			for(i=0;i<c.length;i++)
+			{
+							    c[i].setAttribute("class","p-4 bg-accent-polar font-mono text-base rounded-md overflow-auto");
+						}
+			var h=document.querySelectorAll('main h2');
+			for(i=0;i<h.length;i++)
+			{
+							    h[i].setAttribute("class","text-2xl font-bold py-2");
+						}
+							
+			var aa=document.querySelectorAll('p a');
+			for(i=0;i<aa.length;i++)
+			{
+							    aa[i].setAttribute("class","text-accent-regular visited:text-accent-regular");
+			    }
+							
+			}
+
+				
+		</script>
+<div class="px-1 py-4 grid grid-cols-1 md:grid-cols-8">
+  <div class="hidden md:block md:col-span-1 lg:col-span-2"></div>
+  <div class="col-span-1 md:col-span-6 lg:col-span-4">
+    <header>
+      <h2 class="text-base font-bold text-accent-regular space-x-2">
+                  <span>
+			      {% assign d = page.date | date: "%d" | plus:'0' %}
+			      {{ page.date | date: "%B" }}
+			      {% case d %}
+			      {% when 1 or 21 or 31 %}{{ d }}st
+			      {% when 2 or 22 %}{{ d }}nd
+			      {% when 3 or 23 %}{{ d }}rd
+			      {% else %}{{ d }}th
+			      {% endcase %}, {{ page.date | date: "%Y" }}</span>
+      </h2>
+      <h1 class="text-4xl font-extrabold">
+	      {{page.title}}
+      </h1>
+    </header>
+    <main class="text-justify">
+    	{{page.content}}
+    </main>
+    <footer class="flex flex-col space-y-4">
+      <div class="flex flex-col align-start justify-start max-w-100">
+        <h3 class="font-bold text-lg">Topics of this post</h3>
+
+        <p>
+            {% for category in page.categories %}
+            {% if forloop.last == false %}
+            <span><a class="text-accent-regular" href="/?topic={{category}}"><span>{{category}}</span></a>, </span>
+            {% else %}
+            <span><a class="text-accent-regular" href="/?topic={{category}}"><span>{{category}}</span></a></span>
+            {% endif %}
+            {% endfor %}
+        </p>
+      </div>
+      <a
+        class="
+          w-full
+          grid
+          place-items-center
+          py-2
+          px-2
+          rounded
+          bg-accent-polar
+          hover:bg-accent-light
+          active:bg-accent-medium
+          font-bold
+          text-xl
+          cursor-pointer
+        "
+        href="/"
+        >🏡 Back Home</a
+      >
+    </footer>
+  </div>
+  <div class="hidden md:block md:col-span-1 lg:col-span-2"></div>
+</div>

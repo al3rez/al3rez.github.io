@@ -1,0 +1,953 @@
+<html lang="en">
+  <script>
+    window.store = {
+    			  "posts": [
+                {% for post in site.posts %}
+            {
+        			      "title": "{{ post.title | xml_escape }}",
+        				      "url": "{{ site.url }}{{ post.url }}",
+                    "date": "{% assign d = post.date | date: "%d" | plus:'0' %} {{
+                    post.date | date: "%B" }} {% case d %} {% when 1 or 21 or 31
+                    %}{{ d }}st {% when 2 or 22 %}{{ d }}nd {% when 3 or 23 %}{{
+                    d }}rd {% else %}{{ d }}th {% endcase %}, {{ post.date |
+                    date: "%Y" }}"
+    
+            }
+        {% unless forloop.last %},{% endunless %}
+        {% endfor %}
+    
+    	],
+    "categories": [
+        {% for cat in site.categories %}
+        {
+            "title": "{{ cat | first}}",
+            "counter": {{cat[1] | size}},
+            "posts": [
+                {% for post in cat[1] %}
+            {
+        			      "title": "{{ post.title | xml_escape }}",
+        				      "url": "{{ site.url }}{{ post.url }}",
+                    "date": "{% assign d = post.date | date: "%d" | plus:'0' %} {{
+                    post.date | date: "%B" }} {% case d %} {% when 1 or 21 or 31
+                    %}{{ d }}st {% when 2 or 22 %}{{ d }}nd {% when 3 or 23 %}{{
+                    d }}rd {% else %}{{ d }}th {% endcase %}, {{ post.date |
+                    date: "%Y" }}"
+            },
+        {% unless forloop.last %},{% endunless %}
+        {% endfor %}
+    
+            ]
+        }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+    ]
+        }
+    
+            function loadMore() {
+                    $("li.hidden:lt(5)").removeClass("hidden");
+                  }
+    
+    function searchPosts(sel) {
+      $("span.title").removeClass("text-accent-medium");
+      $(sel).find("span:first").addClass("text-accent-medium");
+      var q = $(sel).find("span:first").text();
+     var posts = $(window.store["categories"]).map(function(i,v){ if(v["title"] == q){return v["posts"]} }).get()
+    		$("ul:first").html("");
+    		posts.forEach(function(post) {
+    	 $("ul:first").append(`<li class="py-2 px-4 rounded hover:bg-accent-polar active:bg-accent-light cursor-pointer"><a href="${post.url}"><div class="flex-row"><span class="block text-accent-regular text-sm">${post.date}</span> <h3 class="font-bold text-lg">${post.title}</h3> </div></a></li>`)
+    				})
+      return false;
+    }
+    
+    function searchCategories(term) {
+     var categories = $(window.store["categories"]).map(function(i,v){ if(v["title"].toLowerCase().indexOf(term.toLowerCase())!=-1){return v} }).get()
+            $("ul:last").html("");
+    
+    if (term === "" || categories.legnth <= 0) {
+          window.store["categories"].forEach(function(cat) {
+           $("ul:last").append(                `             <li>
+             <a href="#" onclick=searchPosts(this)
+              ><span class="text-accent-regular title">${cat.title}</span>
+              <span class="text-accent-medium"
+                >${cat.counter}</span
+              ></a
+            >
+          </li>`)            })
+    }
+    if (term !== "" && categories.length >= 1) {
+          categories.forEach(function(cat) {
+           $("ul:last").append(                `             <li>
+            <a href="#" onclick=searchPosts(this)
+              ><span class="text-accent-regular title">${cat.title}</span>
+              <span class="text-accent-medium"
+                >${cat.counter}</span
+              ></a
+            >
+          </li>`)
+        })
+        }
+    
+    }
+  </script>
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous"
+  ></script>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="shortcut icon" href="{{'favicon.ico' | relative_url}}" />
+    <meta name="theme-color" content="#0200ff" />
+    <meta charset="utf-8" />
+    {% if page.url == '/' %}
+    <title>Alireza Bashiri</title>
+    {% else %}
+    <title>{{page.title}}</title>
+    {% endif %}
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Alireza Bashiri" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Alireza Bashiri is a productivity-focused software engineer with more than 8 years of experience building awesome applications for small agencies, mid-sized companies, and Fortune 50 corporations."
+    />
+      <meta property="og:type" content="profile" />
+      <meta property="og:title" content="{{page.title}}" />
+      <meta property="og:url" content="https://al3rez.github.io" />
+      <meta property="og:profile:first_name" content="Alireza" />
+      <meta property="og:profile:last_name" content="Bashiri" />
+      <link rel="alternate" href="https://al3rez.github.io" hreflang="en" />
+      <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900"
+      rel="stylesheet"
+      data-optimized-fonts="true"
+    />
+        <link rel="canonical" href="https://al3rez.github.io" />
+        <meta name="next-head-count" content="20" />
+        <link rel="preload" href="{{'preload.css' | relative_url}}" as="style" />
+        <link rel="stylesheet" href="{{'main.css' | relative_url}}" data-n-g="" />
+        <script src="https://unpkg.com/lunr/lunr.js"></script>
+        <noscript data-n-css=""></noscript>
+        <style
+      data-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Spectral:ital,wght@0,400;0,700;1,400;1,700&amp;family=Fira+Code"
+    >
+          @font-face {
+            font-family: "Fira Code";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/firacode/v10/uU9eCBsR6Z2vfE9aq3bL0fxyUs4tcw4W_D1sFVQ.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZs.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZs.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYMZs.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYMZs.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuDyYMZs.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuBWYMZs.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCt-xNNww_2s0amA9M8kn4.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCu-xNNww_2s0amA9M8qsHDafA.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCr-xNNww_2s0amA-M9.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCs-xNNww_2s0amA9uCt13F.woff)
+              format("woff");
+          }
+          @font-face {
+            font-family: "Fira Code";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/firacode/v10/uU9eCBsR6Z2vfE9aq3bL0fxyUs4tcw4W_D1sJV37MOzlojwUKaJO.woff)
+              format("woff");
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+              U+A640-A69F, U+FE2E-FE2F;
+          }
+          @font-face {
+            font-family: "Fira Code";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/firacode/v10/uU9eCBsR6Z2vfE9aq3bL0fxyUs4tcw4W_D1sJVT7MOzlojwUKaJO.woff)
+              format("woff");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Fira Code";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/firacode/v10/uU9eCBsR6Z2vfE9aq3bL0fxyUs4tcw4W_D1sJVz7MOzlojwUKaJO.woff)
+              format("woff");
+            unicode-range: U+1F00-1FFF;
+          }
+          @font-face {
+            font-family: "Fira Code";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/firacode/v10/uU9eCBsR6Z2vfE9aq3bL0fxyUs4tcw4W_D1sJVP7MOzlojwUKaJO.woff)
+              format("woff");
+            unicode-range: U+0370-03FF;
+          }
+          @font-face {
+            font-family: "Fira Code";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/firacode/v10/uU9eCBsR6Z2vfE9aq3bL0fxyUs4tcw4W_D1sJV77MOzlojwUKaJO.woff)
+              format("woff");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Fira Code";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/firacode/v10/uU9eCBsR6Z2vfE9aq3bL0fxyUs4tcw4W_D1sJVD7MOzlojwUKQ.woff)
+              format("woff");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+              U+A640-A69F, U+FE2E-FE2F;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa0ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+1F00-1FFF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0370-03FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+              U+A640-A69F, U+FE2E-FE2F;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa0ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+1F00-1FFF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0370-03FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 500;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+              U+A640-A69F, U+FE2E-FE2F;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa0ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+1F00-1FFF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0370-03FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+              U+A640-A69F, U+FE2E-FE2F;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa0ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+1F00-1FFF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0370-03FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+              U+A640-A69F, U+FE2E-FE2F;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa0ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+1F00-1FFF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0370-03FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 800;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+              U+A640-A69F, U+FE2E-FE2F;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa0ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2ZL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+1F00-1FFF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0370-03FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2pL7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7W0Q5n-wU.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Inter";
+            font-style: normal;
+            font-weight: 900;
+            src: url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCt-xNNww_2s0amA9M8on7mTNmnUHowCw.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCt-xNNww_2s0amA9M8onXmTNmnUHowCw.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCt-xNNww_2s0amA9M8onTmTNmnUHowCw.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCt-xNNww_2s0amA9M8onrmTNmnUHo.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCu-xNNww_2s0amA9M8qsHDWfCFXVAKArdqqQ.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCu-xNNww_2s0amA9M8qsHDWfuFXVAKArdqqQ.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCu-xNNww_2s0amA9M8qsHDWfqFXVAKArdqqQ.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: italic;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCu-xNNww_2s0amA9M8qsHDWfSFXVAKArc.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCr-xNNww_2s0amA9M9knjsS_ulYHs.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCr-xNNww_2s0amA9M2knjsS_ulYHs.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCr-xNNww_2s0amA9M3knjsS_ulYHs.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCr-xNNww_2s0amA9M5knjsS_ul.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCs-xNNww_2s0amA9uCt23FafaPWnIIMrY.woff2)
+              format("woff2");
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCs-xNNww_2s0amA9uCt23OafaPWnIIMrY.woff2)
+              format("woff2");
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+              U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCs-xNNww_2s0amA9uCt23PafaPWnIIMrY.woff2)
+              format("woff2");
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+              U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+          }
+          @font-face {
+            font-family: "Spectral";
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/spectral/v7/rnCs-xNNww_2s0amA9uCt23BafaPWnII.woff2)
+              format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+              U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+              U+2212, U+2215, U+FEFF, U+FFFD;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="__next">
+          <nav class="grid grid-cols-12 p-4 select-none">
+            <div
+          class="
+            col-span-12
+            md:col-span-4
+            justify-self-center
+            md:justify-self-auto
+          "
+        >
+              <h1
+            class="
+              text-2xl
+              md:text-xl
+              font-extrabold
+              md:font-bold
+              whitespace-no-wrap
+            "
+          >
+                <span
+              class="
+                text-black
+                hover:text-accent-regular
+                active:text-accent-dark
+              "
+              ><a href="/">Alireza Bashiri</a></span
+            >
+              </h1>
+            </div>
+            <div class="hidden md:block col-span-4"></div>
+            <div class="hidden md:block col-span-4 space-x-4 justify-self-end">
+              <!---<span
+            class="text-black hover:text-accent-regular active:text-accent-dark"
+            ><a href="/about">About</a></span
+                                         -->
+              <span
+            class="text-black hover:text-accent-regular active:text-accent-dark"
+            ><a href="https://github.com/al3rez"><b> 😺 GitHub</b></a></span
+          >
+              <span
+            class="text-black hover:text-accent-regular active:text-accent-dark"
+            ><a
+              href="https://upwork.com/fl/al3rez"
+              style="color: rgb(20, 168, 0)"
+              ><b> ⭐ Upwork | Top-rated</b></a
+            ></span
+          >
+            </div>
+          </nav>
+          {% if page.url == '/' %}
+          <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-8">
+            <div class="hidden md:block col-span-1 lg:col-span-2"></div>
+            {% for post in site.posts limit:1 %}
+            <a
+          class="
+            block
+            col-span-1
+            md:col-span-4
+            p-4
+            rounded
+            bg-accent-polar
+            cursor-pointer
+            active:bg-accent-light
+          "
+          href="{{post.url}}"
+          >
+              <h2 class="text-accent-regular font-bold">
+                Latest · {% assign d = post.date | date: "%d" | plus:'0' %} {{
+                post.date | date: "%B" }} {% case d %} {% when 1 or 21 or 31 %}{{ d
+                }}st {% when 2 or 22 %}{{ d }}nd {% when 3 or 23 %}{{ d }}rd {% else
+                %}{{ d }}th {% endcase %}, {{ post.date | date: "%Y" }}
+              </h2>
+              <h1 class="font-extrabold text-4xl">{{post.title}}</h1>
+            </a
+        >
+            {% endfor %}
+            <div class="hidden md:block col-span-1 lg:col-span-2"></div>
+          </div>
+          <div class="grid py-8 grid-cols-1 md:grid-cols-5">
+            <div class="hidden md:block md:col-span-1"></div>
+            <div class="col-span-1 md:col-span-3 flex flex-col space-y-2">
+              <ul class="flex flex-col space-y-2">
+                {% for post in site.posts %}
+                <li
+              class="
+                py-2
+                px-4
+                rounded
+                hover:bg-accent-polar
+                active:bg-accent-light
+                cursor-pointer
+              "
+            >
+                  <a href="{{post.url}}"
+                >
+                    <div class="flex-row">
+                      <span class="block text-accent-regular text-sm">
+                        {% assign d = post.date | date: "%d" | plus:'0' %} {{
+                        post.date | date: "%B" }} {% case d %} {% when 1 or 21 or 31
+                        %}{{ d }}st {% when 2 or 22 %}{{ d }}nd {% when 3 or 23 %}{{
+                        d }}rd {% else %}{{ d }}th {% endcase %}, {{ post.date |
+                        date: "%Y" }}</span
+                  >
+                      <h3 class="font-bold text-lg">{{post.title}}</h3>
+                    </div>
+                  </a
+              >
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div class="hidden md:block md:col-span-1">
+              <div class="space-y-2 p-2">
+                <div class="flex items-center space-x-2">
+                  <h3 class="font-lg font-semibold">Topics</h3>
+                  <input
+                class="text-sm placeholder-accent-medium p-2 outline-none"
+                placeholder="Search"
+                oninput="searchCategories(this.value)"
+                size="5"
+                type="search"
+                value=""
+              />
+                  </div>
+                  <ul class="flex flex-col space-y-1">
+                    {% for category in site.categories %}
+                    {% if forloop.index >= 5 %}
+                    <li class="hidden">
+                      <a href="#" onclick=searchPosts(this)
+                    ><span class="text-accent-regular title">{{category | first}}</span>
+                        <span class="text-accent-medium"
+                      >{{category[1] | size}}</span
+                    ></a
+                  >
+                    </li>
+                    {% else %}
+                    <li>
+                      <a href="#" onclick=searchPosts(this)
+                    ><span class="text-accent-regular title">{{category | first}}</span>
+                        <span class="text-accent-medium"
+                      >{{category[1] | size}}</span
+                    ></a
+                  >
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                  </ul>
+                  <button
+                  onclick=loadMore()
+              class="
+                text-sm
+                outline-none
+                rounded-lg
+                hover:bg-accent-polar
+                active:bg-accent-light
+                px-3
+                py-2
+              "
+            >
+                    Load more
+                  </button>
+                </div>
+              </div>
+            </div>
+            {% endif %} {% if page.url != '/' %} {{content}} {% endif %}
+            <div class="grid place-items-center my-4">
+              <a
+          href="/blog/2021-05-16-improving-observability-with-build-information"
+          >
+                <p class="hidden md:block">
+                  🔦 Running on <span>8a467487a58b190c48a982f970b92311c04777a7</span>
+                </p>
+              </a
+        >
+            </div>
+          </div>
+        </body>
+      </html>
