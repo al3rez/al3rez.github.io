@@ -1,0 +1,57 @@
+---
+interface Props {
+  post: CollectionEntry<"posts">;
+  index?: boolean;
+}
+
+import type { CollectionEntry } from "astro:content";
+import Layout from "./layout.astro";
+
+const { post, index = false } = Astro.props;
+const { Content } = await post.render();
+---
+
+<Layout title={post.data.title}>
+  {
+    !index && (
+      <h1 class="text-4xl font-extrabold text-pretty">{post.data.title}</h1>
+    )
+  }
+
+  {
+    post.data.date !== null && (
+      <p class="mt-2 text-gray-400 font-medium font-handwriting">
+        {post.data.date.toLocaleString("en-US", {
+          timeZone: "UTC",
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })}
+      </p>
+    )
+  }
+
+  <div
+    class:list={[
+      !index && "mt-6 sm:mt-8",
+      "prose prose-stone prose-xl max-w-none",
+      "text-gray-900",
+      "prose-strong:font-bold",
+      "prose-p:font-serif prose-p:leading-[1.6]",
+      "prose-li:font-serif prose-li:my-1.5 prose-li:leading-[1.6]",
+      "prose-a:font-normal prose-a:text-blue-800",
+      "prose-li:marker:text-gray-900",
+      "prose-headings:text-gray-900",
+      "prose-h2:text-3xl prose-h3:text-2xl",
+      "prose-img:max-h-[70vh] prose-video:max-h-[70vh]",
+      "prose-code:text-[0.9em] prose-pre:text-[0.8em] ",
+      "prose-pre:rounded-none prose-pre:!bg-white prose-pre:px-5 prose-pre:py-3 prose-pre:leading-[1.5] prose-pre:ring-1 prose-pre:ring-gray-200/50 prose-pre:shadow-sm",
+      "prose-code:before:content-none prose-code:after:content-none",
+      "prose-img:ring-1 prose-img:ring-gray-200/50 prose-img:shadow-sm",
+      "before:prose-p:content-none after:prose-p:content-none",
+      "prose-hr:h-auto prose-hr:border-none before:prose-hr:content-['⁂'] before:prose-hr:block before:prose-hr:text-center before:prose-hr:font-serif before:prose-hr:text-gray-900",
+    ]}
+  >
+    <Content />
+  </div>
+</Layout>

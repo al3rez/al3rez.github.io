@@ -1,0 +1,105 @@
+---
+interface Props {
+  title: string;
+}
+
+import "../css/style.css";
+import "../css/fonts.css";
+
+import Polaroid from "./polaroid.astro";
+import NavLink from "./nav-link.astro";
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+
+    <title>{title}</title>
+    <link rel="icon" href="https://emojicdn.elk.sh/🐗" />
+    <meta property="og:title" content={title} />
+    <meta property="og:site_name" content="Alireza Bashiri" />
+
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Alireza Bashiri"
+      href="/rss"
+    />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Shantell+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="antialiased bg-gray-50 text-gray-950">
+    <div
+      class="px-4 pt-4 sm:pt-16 pb-24 sm:pb-36 sm:grid sm:grid-cols-[max-content,minmax(0,36rem)] sm:justify-center sm:gap-x-20"
+    >
+      <div
+        class:list={[
+          "sm:h-max sm:sticky sm:top-16",
+          "max-sm:bg-gray-100 max-sm:border-b max-sm:border-b-gray-200 max-sm:-m-4 max-sm:p-4",
+          "max-sm:flex max-sm:items-end max-sm:gap-x-4",
+        ]}
+      >
+        <Polaroid />
+        <div class="sm:mt-6 space-y-0.5 sm:space-y-4">
+          <p
+            class="sm:hidden font-handwriting font-medium text-lg text-gray-900"
+          >
+            <a href="/">Alireza Bashiri</a>
+          </p>
+          <div
+            class="max-sm:flex max-sm:flex-wrap max-sm:gap-x-2.5 sm:text-right text-gray-800"
+          >
+            <NavLink href="/">Home</NavLink>
+            <NavLink href="/blog">Blog</NavLink>
+            <NavLink href="/work">Work</NavLink>
+            <NavLink href="/projects">Projects</NavLink>
+          </div>
+
+          <div class="max-sm:hidden text-right text-gray-500">
+            <NavLink href="https://buttondown.email/al3rez?as_embed" newTab>
+              Newsletter
+            </NavLink>
+            <NavLink href="/rss" newTab>RSS feed</NavLink>
+          </div>
+
+          <div
+            class="max-sm:flex max-sm:flex-wrap max-sm:gap-x-2.5 sm:text-right text-gray-500"
+          >
+            <NavLink href="/contact">Contact</NavLink>
+            <NavLink href="https://twitter.com/al3rez">Twitter</NavLink>
+            <NavLink href="https://github.com/al3rez">GitHub</NavLink>
+            <div class="max-sm:hidden">
+              <NavLink href="https://linkedin.com/in/al3rez">
+                LinkedIn
+              </NavLink>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="max-sm:mt-12">
+        <slot />
+      </div>
+    </div>
+
+    <script is:inline>
+      document.querySelectorAll("[data-email]").forEach((el) => {
+        const email = [["com", "gmail"].reverse().join("."), "al3rez"]
+          .reverse()
+          .join("@");
+
+        el.textContent = email;
+        el.href = `mailto:${email}`;
+      });
+    </script>
+  </body>
+</html>

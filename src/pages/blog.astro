@@ -1,0 +1,71 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../components/layout.astro";
+import Star from "../components/star.astro";
+import getPostDate from "../lib/get-post-date";
+
+const posts = (await getCollection("posts"))
+  .filter((post) => !post.data.unlisted)
+  .sort((a, b) => {
+    return getPostDate(b).getTime() - getPostDate(a).getTime();
+  });
+---
+
+<Layout title="Alireza Bashiri’ Blog">
+  <p class="sm:hidden text-right text-gray-400">
+    Subscribe via
+    <a
+      href="https://buttondown.email/al3rez?as_embed"
+      target="_blank"
+      class="underline decoration-gray-300">monthly newsletter</a
+    >
+    or
+    <a href="/rss" target="_blank" class="underline decoration-gray-300"
+      >RSS feed</a
+    >.
+  </p>
+
+  <div>
+    {
+      posts.map((post, i) => {
+        const yearMonth = (date: Date) => {
+          return date.toLocaleString("en-US", {
+            timeZone: "UTC",
+            month: "numeric",
+            year: "numeric",
+          });
+        };
+
+        const differentDateFromPrevious =
+          i === 0 ||
+          yearMonth(getPostDate(post)) !== yearMonth(getPostDate(posts[i - 1]));
+
+        return (
+          <>
+            {differentDateFromPrevious && (
+              <p class="-mb-1 mt-6 sm:first-of-type:mt-2 font-handwriting text-gray-400 font-medium">
+                {getPostDate(post).toLocaleString("en-US", {
+                  timeZone: "UTC",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+            )}
+
+            <div class="relative">
+              {post.data.bestOf && (
+                <Star class="max-sm:hidden absolute -left-7" />
+              )}
+              {/* Control text wrapping with &nbsp; to avoid star being on its own line. */}
+              {/* Don't let Prettier add extra spaces. */}
+              {/* prettier-ignore */}
+              <p class="mt-2 text-pretty">
+                <a href={`/${post.slug}`} class="font-serif text-xl underline decoration-gray-300">{post.data.title}</a>&nbsp;{post.data.bestOf && <Star class="sm:hidden" />}
+              </p>
+            </div>
+          </>
+        );
+      })
+    }
+  </div>
+</Layout>
