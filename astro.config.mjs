@@ -5,7 +5,7 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://hog.sh",
+  site: "https://al3rez.com",
   integrations: [tailwind(), sitemap()],
   trailingSlash: "never",
   markdown: {
