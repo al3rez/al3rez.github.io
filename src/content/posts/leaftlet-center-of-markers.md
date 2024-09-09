@@ -1,5 +1,5 @@
 ---
-title: How to zoom in the area with markers using Leaflet.js
+title: How to center the map on a group of markers using Leaflet.js
 unlisted: true
 date: 2024-09-09
 ---
