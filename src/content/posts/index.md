@@ -1,9 +1,7 @@
 ---
-title: Alireza Bashiri
+title: al3rez - little about me
 unlisted: true
 date: null
 ---
 
-Hi there! I'm <span class="font-handwriting font-medium">Alireza Bashiri</span>, I build 2-week MVPs for founders while building my own SaaS.
-
-Now I'm working on [ReplyQ](https://replyqai.com), a social selling tool that helps you advertise your product without sounding like a bot.
+Hi there! I'm <span class="font-handwriting font-medium">Alireza Bashiri</span>, I build MVPs for start-ups, founders, and agencies. Check out my SaaS <a href="http://AstroMVP.com" class="underline decoration-gray-300">AstroMVP.com</a> ($60k closed ARR) 🔥
