@@ -11,7 +11,7 @@ const { post, index = false } = Astro.props;
 const { Content } = await post.render();
 ---
 
-<Layout title={post.data.title}>
+<Layout title={index ? post.data.title : `${post.data.title} - Alireza Bashiri`}>
   {
     !index && (
       <h1 class="text-4xl font-extrabold text-pretty">{post.data.title}</h1>
