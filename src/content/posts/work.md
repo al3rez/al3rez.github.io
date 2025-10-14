@@ -4,18 +4,6 @@ unlisted: true
 date: null
 ---
 
-## AstroMVP - Founder
-*Oct 2024 - Present · Bangkok, Thailand (Remote)*
-
-We build your MVP with AI agents or help you move it off the platform and scale it.
-
-AI Builders we work with:
-- Lovable/Bolt/Replit for front-end and backend
-- Rork/A0 for mobile (iOS and Android)
-- Supabase for database/authentication
-
-**Skills:** Laravel · Next.js · React.js · Lovable · Replit · Supabase
-
 ## Bounty Media - Senior Product Engineer
 *Sep 2022 - Jun 2025 · Singapore (Remote)*
 
