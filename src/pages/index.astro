@@ -1,12 +1,43 @@
 ---
-import { getEntry } from "astro:content";
-import Page from "../components/page.astro";
+import { getCollection } from "astro:content";
+import AsciiLogo from "../components/ascii-logo.astro";
+import EmailLink from "../components/email-link.astro";
+import Layout from "../components/layout.astro";
+import getPostDate from "../lib/get-post-date";
 
-const index = await getEntry("posts", "index");
-
-if (!index) {
-  throw new Error("Index post not found");
-}
+const posts = (await getCollection("posts"))
+  .filter((post) => !post.data.unlisted)
+  .sort((a, b) => getPostDate(b).getTime() - getPostDate(a).getTime());
 ---
 
-<Page post={index} index />
+<Layout
+  title="al3rez"
+  description="Writing about software, systems, and the craft of building things."
+>
+  <main>
+    <AsciiLogo />
+    <nav aria-label="Posts">
+      {
+        posts.map((post) => {
+          const postDate = getPostDate(post);
+          const iso = postDate.toISOString().slice(0, 10);
+
+          return (
+            <p>
+              <a class="datelink" href={`/${post.slug}`}>
+                <time datetime={iso}>{iso}</time>
+              </a>{" "}
+              {post.data.title}
+            </p>
+          );
+        })
+      }
+    </nav>
+  </main>
+  <hr />
+  <footer class="site-footer" aria-label="Site footer">
+    <a href="https://github.com/al3rez" rel="me">github.com/al3rez</a>
+    <a href="https://twitter.com/al3rez" rel="me">twitter.com/al3rez</a>
+    <EmailLink />
+  </footer>
+</Layout>

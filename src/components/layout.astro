@@ -1,109 +1,84 @@
 ---
 interface Props {
   title: string;
+  description?: string;
+  image?: string;
+  type?: "website" | "article";
+  publishedTime?: string;
+  noindex?: boolean;
 }
 
 import "../css/style.css";
-import "../css/fonts.css";
 
-import Polaroid from "./polaroid.astro";
-import NavLink from "./nav-link.astro";
+const {
+  title,
+  description = "Writing about software, systems, and the craft of building things.",
+  image = "/me.jpg",
+  type = "website",
+  publishedTime,
+  noindex = false,
+} = Astro.props;
 
-const { title } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL(image, Astro.site).toString();
 ---
 
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Alireza Bashiri" />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+
+    <meta property="og:type" content={type} />
     <meta property="og:title" content={title} />
-    <meta property="og:site_name" content="Alireza Bashiri" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="al3rez" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    {
+      publishedTime && (
+        <meta property="article:published_time" content={publishedTime} />
+      )
+    }
+    {
+      type === "article" && (
+        <meta property="article:author" content="Alireza Bashiri" />
+      )
+    }
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@al3rez" />
+    <meta name="twitter:site" content="@al3rez" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <link
       rel="alternate"
+      type="application/atom+xml"
+      title="al3rez atom feed"
+      href="/atom.xml"
+    />
+    <link
+      rel="alternate"
       type="application/rss+xml"
-      title="Alireza Bashiri"
+      title="al3rez rss feed"
       href="/rss"
     />
-    <link rel="sitemap" href="/sitemap-index.xml" />
-
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Shantell+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-      rel="stylesheet"
-    />
-
-    <script defer data-domain="al3rez.com" is:inline src="https://plausible.al3rez.com/js/script.file-downloads.hash.outbound-links.js"></script>
-    <script is:inline>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
   </head>
-  <body class="antialiased bg-gray-50 text-gray-950">
-    <div
-      class="px-4 pt-4 sm:pt-16 pb-24 sm:pb-36 sm:grid sm:grid-cols-[max-content,minmax(0,36rem)] sm:justify-center sm:gap-x-20"
-    >
-      <div
-        class:list={[
-          "sm:h-max sm:sticky sm:top-16",
-          "max-sm:bg-gray-100 max-sm:border-b max-sm:border-b-gray-200 max-sm:-m-4 max-sm:p-4",
-          "max-sm:flex max-sm:items-end max-sm:gap-x-4",
-        ]}
-      >
-        <Polaroid />
-        <div class="sm:mt-6 space-y-0.5 sm:space-y-4">
-          <p
-            class="sm:hidden font-handwriting font-medium text-lg text-gray-900"
-          >
-            <a href="/">Alireza Bashiri</a>
-          </p>
-          <div
-            class="max-sm:flex max-sm:flex-wrap max-sm:gap-x-2.5 sm:text-right text-gray-800"
-          >
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/blog">Blog</NavLink>
-            <NavLink href="/work">Work</NavLink>
-            <NavLink href="/projects">Projects</NavLink>
-          </div>
-
-          <div class="max-sm:hidden text-right text-gray-500">
-            <NavLink href="https://al3rez.substack.com" newTab>
-              Newsletter
-            </NavLink>
-            <NavLink href="/rss" newTab>RSS feed</NavLink>
-          </div>
-
-          <div
-            class="max-sm:flex max-sm:flex-wrap max-sm:gap-x-2.5 sm:text-right text-gray-500"
-          >
-            <NavLink href="/contact">Contact</NavLink>
-            <NavLink href="https://twitter.com/al3rez">Twitter</NavLink>
-            <NavLink href="https://github.com/al3rez">GitHub</NavLink>
-            <div class="max-sm:hidden">
-              <NavLink href="https://linkedin.com/in/al3rez">
-                LinkedIn
-              </NavLink>
-            </div>
-          </div>
-
-        </div>
-      </div>
-      <div class="max-sm:mt-12">
-        <slot />
-      </div>
-    </div>
-
-    <script is:inline>
-      document.querySelectorAll("[data-email]").forEach((el) => {
-        const email = [["com", "gmail"].reverse().join("."), "al3rez"]
-          .reverse()
-          .join("@");
-
-        el.textContent = email;
-        el.href = `mailto:${email}`;
-      });
-    </script>
+  <body>
+    <slot />
   </body>
 </html>

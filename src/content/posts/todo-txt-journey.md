@@ -1,5 +1,5 @@
 ---
-title: I Tried Every Todo App and Ended Up With a .txt File
+title: I tried every todo app and ended up with a .txt file
 unlisted: false
 date: 2025-08-11
 ---
@@ -8,13 +8,13 @@ I've tried them all. Notion, Todoist, Things 3, OmniFocus, Asana, Trello, Any.do
 
 I'm not alone in this. Jeff Huang wrote about his ["never-ending .txt file"](https://jeffhuang.com/productivity_text_file/) that he's used for over 14 years. Reading his post validated everything I'd discovered on my own.
 
-## The Endless Search
+## The endless search
 
 My productivity journey started like everyone else's. I'd devour blog posts about getting things done or spot a cool app and think "this is it, this will finally organize me." I'd burn hours building the perfect system, creating categories, tags, projects, labels. Setting it up felt like work.
 
 Then reality hits. The app wants $9.99/month. The sync breaks. The company sells out and dies. Or worse - I waste more time managing the system than working.
 
-## What Actually Happened With Each App
+## What actually happened with each app
 
 **Notion**: Built an entire life operating system. Spent three weeks perfecting it. Used it for two days. Now it's a graveyard of abandoned databases.
 
@@ -26,7 +26,7 @@ Then reality hits. The app wants $9.99/month. The sync breaks. The company sells
 
 **OmniFocus**: So powerful I needed a manual to use it. Spent more time learning OmniFocus than finishing my actual projects.
 
-## The Breaking Point
+## The breaking point
 
 One day my phone died and I couldn't check my tasks. I grabbed a sticky note and scribbled:
 ```
@@ -38,7 +38,7 @@ One day my phone died and I couldn't check my tasks. I grabbed a sticky note and
 
 And you know what? I crushed all four things. No tags, no priorities, no due dates. Just four things written down.
 
-## My Current System: One Text File
+## My current system: one text file
 
 Now I run everything through a single text file. That's it. Here's what it looks like:
 
@@ -78,7 +78,7 @@ fix that annoying bug in the navbar - was a CSS specificity issue
 
 Every few days I start fresh with a new date. The old sections stay. They transform into my journal. I search back to find when I did something, who I met, what we decided. Todo list and work log in one file.
 
-## Why This Actually Works
+## Why this actually works
 
 **It's always there**: The file sits on my desktop. It stares at me every time I open my laptop. No app to launch, no subscription to manage.
 
@@ -96,7 +96,7 @@ Every few days I start fresh with a new date. The old sections stay. They transf
 
 **It lasts forever**: A text file is the most basic thing a computer can read. It'll work after every software update, every company shutdown, every app that stops working. Text files from 20 years ago still open perfectly. Try that with your Notion workspace.
 
-## The Secret Sauce
+## The secret sauce
 
 Productivity isn't about finding the perfect app. It's about:
 
@@ -106,7 +106,7 @@ Productivity isn't about finding the perfect app. It's about:
 
 That's it. Everything else is procrastination dressed up as organization.
 
-## What About [Insert Feature Here]?
+## What about [insert feature here]?
 
 "But what about reminders?" - I use my calendar for time-specific stuff.
 
@@ -116,11 +116,11 @@ That's it. Everything else is procrastination dressed up as organization.
 
 "But what about mobile?" - The file syncs through Dropbox. Any text editor works.
 
-## The Plot Twist
+## The plot twist
 
 I'm more productive now than when I had all those fancy apps. Turns out the best productivity system is the one you actually use. And I use this one because there's nothing to figure out. It's just a list.
 
-## Try It Yourself
+## Try it yourself
 
 Ready to ditch the productivity app hamster wheel? Do this:
 

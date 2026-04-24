@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   return rss({
     title: "Alireza Bashiri",
-    description: "Alireza Bashiri’ personal website.",
+    description: "Articles by Alireza Bashiri.",
     site: site!,
     items: posts.map((post) => ({
       title: post.data.title,

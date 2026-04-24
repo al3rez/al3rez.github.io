@@ -1,12 +1,12 @@
 ---
-title: How I Use AppleScript to Block My Time
+title: How I use AppleScript to block my time
 unlisted: false
 date: 2024-12-11
 ---
 
 I've been using time-blocking for a while now, and I've found that it's a great way to stay focused on my work. Time-blocking is simple: you plan your day by setting aside specific chunks of time for different tasks. Think of it like building blocks for your day, where each block is dedicated to one activity.
 
-## My Simple System
+## My simple system
 
 My approach is straightforward. I keep a text file with my daily schedule, and I use a small program (AppleScript) to automatically put these times into my calendar. Here's what my schedule looks like:
 
@@ -23,7 +23,7 @@ When I update this file, my computer automatically:
 2. Creates calendar events for each task
 3. Adds a checkmark (✓) to completed tasks
 
-## Quick Entry with Cursor Tab
+## Quick entry with Cursor Tab
 
 One of my favorite tricks is using Cursor Tab for entering time blocks. As I type, it suggests completions for times and common tasks. For example:
 
@@ -33,14 +33,14 @@ One of my favorite tricks is using Cursor Tab for entering time blocks. As I typ
 
 This small feature saves me a lot of typing and keeps my schedule format consistent. It's like having a smart assistant that knows my daily patterns.
 
-## Why This Works for Me
+## Why this works for me
 
 1. **Easy to Change**: I can quickly update my schedule by editing a simple text file, with Cursor Tab making entry even faster
 2. **Works Everywhere**: I can view my schedule on my phone, computer, or tablet
 3. **Keeps Track**: I can see what I've finished (with checkmarks) and what's coming up
 4. **Stays in Sync**: My calendar updates automatically whenever I make changes
 
-## Getting Started with Time-Blocking
+## Getting started with time-blocking
 
 If you want to try time-blocking, you don't need any special tools to start. Here's how:
 
@@ -49,7 +49,7 @@ If you want to try time-blocking, you don't need any special tools to start. Her
 3. Be realistic: Leave gaps between tasks for breaks and unexpected things
 4. Review daily: Take 5 minutes each evening to plan the next day
 
-## The Benefits I've Seen
+## The benefits I've seen
 
 Since starting this system:
 
@@ -59,7 +59,7 @@ Since starting this system:
 - I don't forget important tasks
 - I take proper breaks
 
-## Making It Work Long-Term
+## Making it work long-term
 
 The key to making time-blocking stick is to keep it simple. Don't try to plan every minute. Instead:
 
@@ -68,7 +68,7 @@ The key to making time-blocking stick is to keep it simple. Don't try to plan ev
 - Leave some open spaces in your day
 - Update your schedule when things change
 
-## Next Steps
+## Next steps
 
 You can start time-blocking today with just paper and pen. Once you're comfortable, you can try digital tools or even set up an automatic system like mine. Tools like Cursor Tab can make the process even smoother. The important thing is to find what works for you and stick with it.
 

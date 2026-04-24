@@ -1,0 +1,28 @@
+---
+const label = "al3rez [at] gmail [dot] com";
+---
+
+<a
+  class="email-link"
+  href="#"
+  data-name="al3"
+  data-suffix="rez"
+  data-host="gmail"
+  data-tld="com"
+  aria-label="Email al3rez"
+>{label}</a>
+
+<script is:inline>
+  for (const link of document.querySelectorAll(
+    "a.email-link[data-name][data-suffix][data-host][data-tld]:not([data-ready])",
+  )) {
+    link.dataset.ready = "true";
+
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      const email = `${link.dataset.name}${link.dataset.suffix}@${link.dataset.host}.${link.dataset.tld}`;
+      window.location.href = `mailto:${email}`;
+    });
+  }
+</script>

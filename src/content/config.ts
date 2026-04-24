@@ -8,6 +8,7 @@ export const collections = {
       unlisted: z.boolean(),
       date: z.date().nullable(),
       bestOf: z.boolean().default(false),
+      description: z.string().optional(),
     }),
   }),
 };
