@@ -3,6 +3,7 @@ title: Turning an old iOS handwriting app into a tiny web app
 unlisted: false
 date: 2026-05-27
 description: I ported an old Text to Handwriting iOS project to a static browser app and shipped it at al3rez.com/handwriter.
+image: /handwriter/og-image.png
 ---
 
 I had an old iOS project sitting around called Text to Handwriting. The idea is simple: type some text, render it with a handwriting style, and export it as an image. The original app was written in Swift and used iOS document APIs. Nice for an iPhone app. Less nice if I want to send someone a link.

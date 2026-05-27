@@ -9,6 +9,7 @@ export const collections = {
       date: z.date().nullable(),
       bestOf: z.boolean().default(false),
       description: z.string().optional(),
+      image: z.string().optional(),
     }),
   }),
 };
