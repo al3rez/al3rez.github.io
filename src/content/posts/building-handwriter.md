@@ -1,55 +1,53 @@
 ---
-title: Turning an old iOS handwriting app into a tiny web app
+title: Building Handwriter, a tiny browser app for fake handwriting
 unlisted: false
 date: 2026-05-27
-description: I ported an old Text to Handwriting iOS project to a static browser app and shipped it at al3rez.com/handwriter.
+description: I built a small static browser app that turns typed text into handwritten-looking pages and exports them as PNGs.
 image: /handwriter/og-image.png
 ---
 
-I had an old iOS project sitting around called Text to Handwriting. The idea is simple: type some text, render it with a handwriting style, and export it as an image. The original app was written in Swift and used iOS document APIs. Nice for an iPhone app. Less nice if I want to send someone a link.
+I wanted a small tool that turns typed text into something that looks handwritten. Not a full product. Not a service. Just a page I can open, type into, and export as an image.
 
-So I turned it into a web app:
+So I built Handwriter:
 
 [Try Handwriter](/handwriter/)
 
-It is not a big SaaS thing. There is no account system, no database, no backend. It is just HTML, CSS, JavaScript, a canvas, and a default character set.
+It is plain HTML, CSS, JavaScript, a canvas, and a character set stored as JSON. No accounts. No backend. No build step for the app itself.
 
-## What I kept
+## The idea
 
-The useful part of the original app was the model. A character is not a font glyph. It is a little set of handwriting strokes. The app picks from available samples and draws them onto a page with a bit of variation, so the output does not look like the same pasted letter over and over.
+A character is not treated like a font glyph. It is a small set of handwriting strokes. The app picks from available samples and draws them onto a canvas with a bit of variation, so the output does not feel like the same pasted letter repeated across the page.
 
-That translated well to the browser.
+The default handwriting data lives in `default-charset.json`. On load, the app fetches that file, keeps the character samples in memory, and uses canvas to draw the page.
 
-The web version keeps a `default-charset.json` file with character samples. On load, the app fetches that file, stores the character data in memory, and uses canvas to draw each character. The page itself is just a canvas pretending to be paper.
+The page is basically a canvas pretending to be paper.
 
-## What I threw away
+## What I kept simple
 
-A lot of the iOS app did not need to come over.
-
-The SwiftUI screens, document browser, PencilKit bits, template editor, image picker, and app lifecycle code were useful on iOS, but they would have made the web version feel heavier than it needed to be.
-
-For this version I only wanted the part that matters when you open the page:
+I only wanted the things that matter when you open the page:
 
 - type text
 - see handwriting
-- tweak size, line spacing, color, and style
+- change size, line spacing, color, and style
 - export a PNG
 
-That is enough.
+That is enough for now.
 
-## The canvas part
+There is no editor framework. The visible page is a canvas, and a hidden textarea handles real keyboard input. When the text changes, the app redraws the page.
 
-The editor uses a hidden textarea for real keyboard input. The visible page is a canvas. When the text changes, the app clears the canvas and draws the page again.
+That sounds wasteful, but it is fine here. The page is small. Canvas is fast. The code stays boring.
 
-That sounds wasteful, but for this size of app it is fine. Canvas redraws are fast enough, and the code stays simple. I would rather have boring rendering code that works than a clever partial redraw system that breaks whenever text wraps differently.
+## The annoying parts
 
-The hardest part was not drawing lines. It was making typed text feel like it belongs on a page. Characters need spacing. Lines need wrapping. The cursor needs to land somewhere sensible. Export needs to produce the same page the user sees.
+Drawing strokes is the easy part.
 
-None of that is hard in isolation. It is just a pile of small details.
+The fussy part is making text feel like it belongs on a page. Characters need spacing. Lines need wrapping. The cursor needs to appear in the right-ish place. Export needs to match what the user sees.
+
+None of this is impressive by itself. It is just a stack of small details, and each one is annoying when it is slightly wrong.
 
 ## Shipping it
 
-The app is static, so deployment was almost boring.
+The app is static, so deployment was simple.
 
 I put the files under `public/handwriter` in my site repo:
 
@@ -62,27 +60,25 @@ og-image.png
 Resources/
 ```
 
-My site is built with Astro and deployed through Vercel, but static files in `public` are copied as-is. That means `/public/handwriter/index.html` becomes:
+My site is built with Astro and deployed through Vercel. Static files in `public` are copied as-is, so the app lives at:
 
 ```text
 https://al3rez.com/handwriter/
 ```
 
-I also pushed a standalone `gh-pages` branch to the existing Handwriter repo, but the clean URL is the one on my own domain.
-
 ## The Open Graph image
 
-I first made an Open Graph image that looked like fake lined paper. It was ugly. Too much decoration, not enough taste.
+The first Open Graph image I made was ugly. It looked like fake lined paper and tried too hard.
 
-I ended up copying the spirit of Armin Ronacher's generated social images: mostly white space, large type, a short description, and a small author mark. His site generates those images with Pillow. Mine is currently generated with a tiny Python script using Pillow too.
+I changed it to something closer to Armin Ronacher's social images: white background, large type, a short description, and a small author mark. It is generated with a tiny Pillow script.
 
-The point is not to make a poster. It just needs to look decent when someone pastes the link into a chat app.
+A share image does not need to be clever. It just needs to not embarrass me when the link shows up in a chat.
 
-## What I like about this kind of project
+## Why I like this
 
-Small tools are underrated. This one does not need a launch plan. It does not need onboarding. It does not need a pricing page. It just needs to load quickly and do the thing.
+Small tools are underrated. This one does not need onboarding. It does not need a pricing page. It does not need a database hiding behind a simple feature.
 
-I like that.
+It just needs to load quickly and do the thing.
 
 The app is here:
 
