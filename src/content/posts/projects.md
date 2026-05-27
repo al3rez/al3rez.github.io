@@ -16,6 +16,7 @@ A selection of web applications I've built demonstrating full-stack development 
 
 ### AI & Automation
 
+- **Handwriter** - Browser app that turns typed text into handwriting: [al3rez.com/handwriter](/handwriter/)
 - **AI Expense Tracker** - Financial automation with machine learning
 - **ReplyQ** - AI-powered content discovery and engagement tool
 - **Tradezo** - Crypto trading assistant with AI-powered insights
