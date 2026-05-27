@@ -28,6 +28,32 @@
   let renderSeed = {};
   let ghostCompletion = "";
 
+  function parseMarkdown(raw) {
+    const tokens = [];
+    let isBold = false, isUnderline = false, isStrikethrough = false;
+    let i = 0;
+    while (i < raw.length) {
+      if (i + 1 < raw.length && raw[i] === "*" && raw[i + 1] === "*") {
+        isBold = !isBold;
+        i += 2;
+        continue;
+      }
+      if (i + 1 < raw.length && raw[i] === "_" && raw[i + 1] === "_") {
+        isUnderline = !isUnderline;
+        i += 2;
+        continue;
+      }
+      if (i + 1 < raw.length && raw[i] === "~" && raw[i + 1] === "~") {
+        isStrikethrough = !isStrikethrough;
+        i += 2;
+        continue;
+      }
+      tokens.push({ char: raw[i], bold: isBold, underline: isUnderline, strikethrough: isStrikethrough, srcIndex: i });
+      i++;
+    }
+    return tokens;
+  }
+
   const pageCanvas = document.getElementById("page");
   const pageCtx = pageCanvas.getContext("2d");
   const hiddenInput = document.getElementById("hidden-input");
@@ -145,21 +171,56 @@
     pageCtx.fillStyle = "#fff";
     pageCtx.fillRect(0, 0, PAGE_W, pageHeight);
 
+    const tokens = parseMarkdown(text);
+
     let x = MARGIN_LEFT;
     let y = MARGIN_TOP + lineSpacing;
     let lineOffset = 0;
     let cursorX = x, cursorY = y, cursorLineOffset = 0;
 
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
+    let underlinePath = [];
+    let underlinePathY = 0;
+    let strikethroughPath = [];
+    let strikethroughPathY = 0;
+    let wasUnderline = false;
+    let wasStrikethrough = false;
+    const decorationLines = [];
 
-      if (i === cursorPos) {
+    function flushUnderline() {
+      if (underlinePath.length >= 2) decorationLines.push({ points: underlinePath.slice(), type: "underline" });
+      underlinePath = [];
+      underlinePathY = 0;
+    }
+
+    function flushStrikethrough() {
+      if (strikethroughPath.length >= 2) decorationLines.push({ points: strikethroughPath.slice(), type: "strikethrough" });
+      strikethroughPath = [];
+      strikethroughPathY = 0;
+    }
+
+    // Map from srcIndex to token index for cursor positioning
+    let cursorMapped = false;
+
+    for (let ti = 0; ti < tokens.length; ti++) {
+      const tok = tokens[ti];
+      const c = tok.char;
+      const i = tok.srcIndex;
+
+      if (!cursorMapped && i >= cursorPos) {
         cursorX = x;
         cursorY = y;
         cursorLineOffset = lineOffset;
+        cursorMapped = true;
       }
 
+      if (!tok.underline && wasUnderline) flushUnderline();
+      if (!tok.strikethrough && wasStrikethrough) flushStrikethrough();
+      wasUnderline = tok.underline;
+      wasStrikethrough = tok.strikethrough;
+
       if (c === "\n") {
+        if (tok.underline) flushUnderline();
+        if (tok.strikethrough) flushStrikethrough();
         x = MARGIN_LEFT + (seededRandom(i, 1) - 0.5) * lineSpacing * 0.08;
         y += lineSpacing;
         lineOffset = 0;
@@ -176,10 +237,12 @@
         continue;
       }
 
-      // Word wrap: check at word start
-      if (i === 0 || text[i - 1] === " " || text[i - 1] === "\n" || text[i - 1] === "\t") {
-        const wordW = measureWord(i, scale, spaceW, letterSp);
+      // Word wrap
+      if (ti === 0 || tokens[ti - 1].char === " " || tokens[ti - 1].char === "\n" || tokens[ti - 1].char === "\t") {
+        const wordW = measureWordTokens(tokens, ti, scale, spaceW, letterSp);
         if (x + wordW > PAGE_W - MARGIN_RIGHT && x > MARGIN_LEFT + 10) {
+          if (tok.underline) flushUnderline();
+          if (tok.strikethrough) flushStrikethrough();
           x = MARGIN_LEFT + (seededRandom(i, 2) - 0.5) * lineSpacing * 0.08;
           y += lineSpacing;
           lineOffset = 0;
@@ -189,15 +252,32 @@
       const strokes = getCharDrawing(c, i);
       if (strokes) {
         const bounds = getStrokeBounds(strokes);
-
-        // iOS placement: x aligns to left edge, y uses fixed baseline (not per-char minY)
         const drawX = x - bounds.minX * scale;
         const drawY = y + lineOffset - BASELINE_REF * scale;
 
+        const boldFactor = tok.bold ? 1.5 : 1.0;
         drawCharacter(pageCtx, strokes, drawX, drawY, scale,
-          charset.forceMultiplier, textColor, writingStyle);
+          charset.forceMultiplier * boldFactor, textColor, writingStyle);
 
         const charW = bounds.width * scale;
+        const charMidX = x + charW * 0.5;
+        const charMaxY = drawY + bounds.maxY * scale;
+        const charMidY = drawY + (bounds.minY + bounds.height * 0.5) * scale;
+
+        if (tok.underline) {
+          const idealY = charMaxY + 4;
+          if (underlinePathY === 0) underlinePathY = idealY;
+          else underlinePathY = underlinePathY * 0.9 + idealY * 0.1 + (seededRandom(i, 7) - 0.5) * 2;
+          underlinePath.push({ x: charMidX, y: underlinePathY });
+        }
+
+        if (tok.strikethrough) {
+          const idealY = charMidY;
+          if (strikethroughPathY === 0) strikethroughPathY = idealY;
+          else strikethroughPathY = strikethroughPathY * 0.9 + idealY * 0.1 + (seededRandom(i, 8) - 0.5) * 2;
+          strikethroughPath.push({ x: charMidX, y: strikethroughPathY });
+        }
+
         x += charW + letterSp + (seededRandom(i, 3) - 0.5) * 1.5;
         lineOffset += (seededRandom(i, 4) - 0.5) * 0.4;
         lineOffset = Math.max(-lineSpacing * 0.06, Math.min(lineSpacing * 0.06, lineOffset));
@@ -206,7 +286,25 @@
       }
     }
 
-    if (cursorPos >= text.length) {
+    if (wasUnderline) flushUnderline();
+    if (wasStrikethrough) flushStrikethrough();
+
+    // Draw decoration lines
+    for (const line of decorationLines) {
+      pageCtx.strokeStyle = textColor;
+      pageCtx.lineWidth = scale * 1.2;
+      pageCtx.lineCap = "round";
+      pageCtx.lineJoin = "round";
+      pageCtx.globalAlpha = 1.0;
+      pageCtx.beginPath();
+      pageCtx.moveTo(line.points[0].x, line.points[0].y);
+      for (let pi = 1; pi < line.points.length; pi++) {
+        pageCtx.lineTo(line.points[pi].x, line.points[pi].y);
+      }
+      pageCtx.stroke();
+    }
+
+    if (!cursorMapped) {
       cursorX = x;
       cursorY = y;
       cursorLineOffset = lineOffset;
@@ -251,7 +349,27 @@
     let w = 0;
     let j = startIdx;
     while (j < text.length && text[j] !== " " && text[j] !== "\n" && text[j] !== "\t") {
+      if (j + 1 < text.length && "*_~".includes(text[j]) && text[j] === text[j + 1]) {
+        j += 2;
+        continue;
+      }
       const strokes = getCharDrawing(text[j], j);
+      if (strokes) {
+        const bounds = getStrokeBounds(strokes);
+        w += bounds.width * scale + letterSp;
+      } else {
+        w += spaceW;
+      }
+      j++;
+    }
+    return w;
+  }
+
+  function measureWordTokens(tokens, startTi, scale, spaceW, letterSp) {
+    let w = 0;
+    let j = startTi;
+    while (j < tokens.length && tokens[j].char !== " " && tokens[j].char !== "\n" && tokens[j].char !== "\t") {
+      const strokes = getCharDrawing(tokens[j].char, tokens[j].srcIndex);
       if (strokes) {
         const bounds = getStrokeBounds(strokes);
         w += bounds.width * scale + letterSp;
@@ -268,25 +386,26 @@
     const scale = charScale();
     const spaceW = lineSpacing * 0.5;
     const letterSp = charset.letterSpacing;
+    const tokens = parseMarkdown(text);
 
     let x = MARGIN_LEFT;
     let lines = 1;
 
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
+    for (let ti = 0; ti < tokens.length; ti++) {
+      const c = tokens[ti].char;
       if (c === "\n") { x = MARGIN_LEFT; lines++; continue; }
       if (c === " ") { x += spaceW; continue; }
       if (c === "\t") { x += spaceW * 4; continue; }
 
-      if (i === 0 || text[i - 1] === " " || text[i - 1] === "\n" || text[i - 1] === "\t") {
-        const wordW = measureWord(i, scale, spaceW, letterSp);
+      if (ti === 0 || tokens[ti - 1].char === " " || tokens[ti - 1].char === "\n" || tokens[ti - 1].char === "\t") {
+        const wordW = measureWordTokens(tokens, ti, scale, spaceW, letterSp);
         if (x + wordW > PAGE_W - MARGIN_RIGHT && x > MARGIN_LEFT + 10) {
           x = MARGIN_LEFT;
           lines++;
         }
       }
 
-      const strokes = getCharDrawing(c, i);
+      const strokes = getCharDrawing(c, tokens[ti].srcIndex);
       if (strokes) {
         const bounds = getStrokeBounds(strokes);
         x += bounds.width * scale + letterSp;
