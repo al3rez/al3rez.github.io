@@ -1,0 +1,165 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  background: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#editor {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#page {
+  background: #fff;
+  cursor: text;
+  display: block;
+  width: 960px;
+  max-width: 960px;
+}
+
+#hidden-input {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Toolbar */
+#toolbar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#toolbar:hover,
+#toolbar.visible {
+  opacity: 1;
+}
+
+#toolbar button {
+  background: none;
+  border: 1px solid #d2d2d7;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #1d1d1f;
+  transition: background 0.15s;
+}
+
+#toolbar button:hover {
+  background: #f0f0f5;
+}
+
+/* Settings Panel */
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.panel.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.panel-content {
+  padding: 24px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.panel-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6e6e73;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.close-btn:hover {
+  background: #f0f0f5;
+}
+
+.panel-content label {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #6e6e73;
+}
+
+.panel-content input[type="range"] {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.panel-content input[type="color"] {
+  width: 100%;
+  height: 36px;
+  border: 1px solid #d2d2d7;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.panel-content select {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #d2d2d7;
+  border-radius: 6px;
+  margin-top: 6px;
+  background: #fff;
+}
+
+#model-status {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  font-size: 12px;
+  color: #aaa;
+  z-index: 50;
+  transition: opacity 0.5s;
+}
