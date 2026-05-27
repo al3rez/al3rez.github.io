@@ -12,10 +12,19 @@ const posts = (await getCollection("posts"))
 
 <Layout
   title="al3rez"
-  description="Writing about software, systems, and the craft of building things."
+  description="Alireza Bashiri is a founding AI engineer at Humano.ai, working on RAG, AI avatar generation, low latency realtime systems, and agentic workflows."
 >
   <main>
     <AsciiLogo />
+
+    <p>
+      I'm Alireza Bashiri. I'm currently a founding AI engineer at <a href="https://humano.ai">humano.ai</a>, where I work on RAG, AI avatar generation, low latency realtime systems, and agentic workflows. We're building <a href="https://livetwin.ai">livetwin.ai</a> and a bunch of other AI products.
+    </p>
+
+    <p>
+      I also founded <a href="https://admix.software">admix.software</a>, <a href="https://astromvp.com">astromvp.com</a>, <a href="https://adworthy.ai">adworthy.ai</a>, and a few other projects.
+    </p>
+
     <nav aria-label="Posts">
       {
         posts.map((post) => {
