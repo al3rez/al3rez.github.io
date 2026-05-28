@@ -1,4 +1,10 @@
 {
+  "redirects": [
+    {
+      "source": "/zehn",
+      "destination": "https://raw.githubusercontent.com/al3rez/zehn/master/scripts/install.sh"
+    }
+  ],
   "headers": [
     {
       "source": "/rss",
