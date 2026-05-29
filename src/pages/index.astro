@@ -1,6 +1,5 @@
 ---
 import { getCollection } from "astro:content";
-import AsciiLogo from "../components/ascii-logo.astro";
 import EmailLink from "../components/email-link.astro";
 import Layout from "../components/layout.astro";
 import getPostDate from "../lib/get-post-date";
@@ -11,11 +10,11 @@ const posts = (await getCollection("posts"))
 ---
 
 <Layout
-  title="al3rez"
+  title="Alireza Bashiri, founding AI engineer at Humano.ai"
   description="Alireza Bashiri is a founding AI engineer at Humano.ai, working on RAG, AI avatar generation, low latency realtime systems, and agentic workflows."
 >
   <main>
-    <AsciiLogo />
+    <img src="/bird.png" alt="al3rez" class="hero-bird" width="220" height="154" />
 
     <p>
       I'm Alireza Bashiri. I'm currently a founding AI engineer at <a href="https://humano.ai">humano.ai</a>, where I work on RAG, AI avatar generation, low latency realtime systems, and agentic workflows. We're building <a href="https://livetwin.ai">livetwin.ai</a> and a bunch of other AI products.

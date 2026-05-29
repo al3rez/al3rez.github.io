@@ -6,6 +6,7 @@ interface Props {
   type?: "website" | "article";
   publishedTime?: string;
   noindex?: boolean;
+  headline?: string;
 }
 
 import "../css/style.css";
@@ -17,10 +18,54 @@ const {
   type = "website",
   publishedTime,
   noindex = false,
+  headline,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const ogImage = new URL(image, Astro.site).toString();
+
+const person = {
+  "@type": "Person",
+  name: "Alireza Bashiri",
+  alternateName: "al3rez",
+  url: "https://al3rez.com",
+  image: new URL("/me.jpg", Astro.site).toString(),
+  jobTitle: "Founding AI Engineer",
+  worksFor: {
+    "@type": "Organization",
+    name: "Humano.ai",
+    url: "https://humano.ai",
+  },
+  sameAs: ["https://github.com/al3rez", "https://twitter.com/al3rez"],
+};
+
+const jsonLd =
+  type === "article"
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: headline ?? title,
+        description,
+        datePublished: publishedTime,
+        dateModified: publishedTime,
+        author: person,
+        publisher: person,
+        image: ogImage,
+        url: canonical,
+        mainEntityOfPage: canonical,
+      }
+    : {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            name: "al3rez",
+            url: "https://al3rez.com",
+            author: person,
+          },
+          person,
+        ],
+      };
 ---
 
 <!doctype html>
@@ -36,8 +81,8 @@ const ogImage = new URL(image, Astro.site).toString();
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
-    <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="180x180" />
     <link rel="apple-touch-icon" href="/favicon.png" />
 
     <meta property="og:type" content={type} />
@@ -78,6 +123,8 @@ const ogImage = new URL(image, Astro.site).toString();
       href="/rss"
     />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body>
     <slot />
