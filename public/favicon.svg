@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .ink { fill: #111111; }
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: #f5f5f5; }
+    }
+    .mono {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      font-weight: 700;
+    }
+  </style>
+  <text class="ink mono" x="13" y="20" font-size="25" text-anchor="middle" dominant-baseline="middle">a</text>
+  <path d="M25 4 Q25 8 29 8 Q25 8 25 12 Q25 8 21 8 Q25 8 25 4 Z" fill="url(#spark)"/>
+</svg>
