@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://al3rez.com/sitemap-index.xml
