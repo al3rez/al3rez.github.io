@@ -6,13 +6,13 @@
       <stop offset="1" stop-color="#f472b6"/>
     </linearGradient>
   </defs>
-  <style>
-    .mono {
-      font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-      font-weight: 700;
-    }
-  </style>
   <rect width="32" height="32" rx="7" fill="url(#tile)"/>
-  <text class="mono" x="16" y="17" font-size="16" letter-spacing="-1"
-        text-anchor="middle" dominant-baseline="central" fill="#ffffff">ab</text>
+  <g fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- cursive a: bowl + stem connecting forward -->
+    <path d="M13 13 C 8 11, 6 19, 10 21 C 13 22, 14 18, 13 14 C 13 18, 13 21, 16 22"/>
+    <!-- cursive b: tall ascender loop down into belly, connecting from a -->
+    <path d="M16 22 C 18 20, 18 10, 16.5 8 C 16 13, 17 21, 19.5 22 C 24 23, 24 16, 20 16 C 18 16, 18 20, 21 21"/>
+    <!-- signature underline flourish -->
+    <path d="M7 26 C 13 24.5, 22 24.5, 27 26.5" stroke-width="1.6"/>
+  </g>
 </svg>
