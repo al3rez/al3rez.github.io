@@ -1,20 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <defs>
-    <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7dd3fc"/>
+    <linearGradient id="tail" gradientUnits="userSpaceOnUse" x1="6" y1="6" x2="25" y2="25">
+      <stop offset="0" stop-color="#7dd3fc" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#7dd3fc" stop-opacity="0.95"/>
       <stop offset="1" stop-color="#f472b6"/>
     </linearGradient>
+    <radialGradient id="head" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fbcfe8"/>
+      <stop offset="0.55" stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#db2777"/>
+    </radialGradient>
   </defs>
   <style>
-    .ink { fill: #111111; }
+    .tile { fill: #f4f4f5; }
+    .star { fill: #18181b; }
     @media (prefers-color-scheme: dark) {
-      .ink { fill: #f5f5f5; }
-    }
-    .mono {
-      font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-      font-weight: 700;
+      .tile { fill: #18181b; }
+      .star { fill: #f4f4f5; }
     }
   </style>
-  <text class="ink mono" x="13" y="20" font-size="25" text-anchor="middle" dominant-baseline="middle">a</text>
-  <path d="M25 4 Q25 8 29 8 Q25 8 25 12 Q25 8 21 8 Q25 8 25 4 Z" fill="url(#spark)"/>
+  <rect class="tile" width="32" height="32" rx="7"/>
+  <path d="M7 7 L24.9 18.1 L18.1 24.9 Z" fill="url(#tail)"/>
+  <circle cx="21.5" cy="21.5" r="4.8" fill="url(#head)"/>
+  <path class="star" d="M25.5 5.8 Q25.5 8 27.7 8 Q25.5 8 25.5 10.2 Q25.5 8 23.3 8 Q25.5 8 25.5 5.8 Z"/>
+  <path class="star" d="M9 23.2 Q9 25 10.8 25 Q9 25 9 26.8 Q9 25 7.2 25 Q9 25 9 23.2 Z"/>
 </svg>
