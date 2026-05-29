@@ -12,11 +12,11 @@
     </radialGradient>
   </defs>
   <style>
-    .tile { fill: #f4f4f5; }
-    .star { fill: #18181b; }
+    .tile { fill: #18181b; }
+    .star { fill: #f4f4f5; }
     @media (prefers-color-scheme: dark) {
-      .tile { fill: #18181b; }
-      .star { fill: #f4f4f5; }
+      .tile { fill: #f4f4f5; }
+      .star { fill: #18181b; }
     }
   </style>
   <rect class="tile" width="32" height="32" rx="7"/>
