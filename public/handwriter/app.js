@@ -468,7 +468,7 @@
     // Draw decoration lines
     for (const line of decorationLines) {
       pageCtx.strokeStyle = textColor;
-      pageCtx.lineWidth = scale * 1.2;
+      pageCtx.lineWidth = Math.max(1.2, charset.forceMultiplier * scale * 2.1);
       pageCtx.lineCap = "round";
       pageCtx.lineJoin = "round";
       pageCtx.globalAlpha = 1.0;
