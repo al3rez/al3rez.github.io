@@ -27,6 +27,8 @@
   let cursorPos = 0;
   let renderSeed = {};
   let ghostCompletion = "";
+  let renderQueued = false;
+  const boundsCache = new WeakMap();
 
   function parseMarkdown(raw) {
     const tokens = [];
@@ -67,7 +69,7 @@
     text = hiddenInput.value;
     cursorPos = hiddenInput.selectionStart;
     ghostCompletion = "";
-    render();
+    scheduleRender();
     requestCompletion();
   });
 
@@ -81,18 +83,18 @@
       hiddenInput.value = text;
       hiddenInput.selectionStart = hiddenInput.selectionEnd = cursorPos;
       ghostCompletion = "";
-      render();
+      scheduleRender();
     }
   });
 
   hiddenInput.addEventListener("keyup", () => {
     cursorPos = hiddenInput.selectionStart;
-    render();
+    scheduleRender();
   });
 
   hiddenInput.addEventListener("click", () => {
     cursorPos = hiddenInput.selectionStart;
-    render();
+    scheduleRender();
   });
 
   // Show toolbar on mouse near bottom
@@ -124,6 +126,9 @@
   }
 
   function getStrokeBounds(strokes) {
+    const cached = boundsCache.get(strokes);
+    if (cached) return cached;
+
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const stroke of strokes) {
       for (const p of stroke) {
@@ -133,7 +138,9 @@
         if (p.y > maxY) maxY = p.y;
       }
     }
-    return { minX, minY, maxX, maxY, width: maxX - minX || 1, height: maxY - minY || 1 };
+    const bounds = { minX, minY, maxX, maxY, width: maxX - minX || 1, height: maxY - minY || 1 };
+    boundsCache.set(strokes, bounds);
+    return bounds;
   }
 
   function seededRandom(index, salt) {
@@ -154,6 +161,15 @@
 
   // --- Render ---
 
+  function scheduleRender() {
+    if (renderQueued) return;
+    renderQueued = true;
+    requestAnimationFrame(() => {
+      renderQueued = false;
+      render();
+    });
+  }
+
   function render() {
     const { lineSpacing, textColor, writingStyle } = settings;
     const scale = charScale();
@@ -162,10 +178,14 @@
 
     const pageHeight = computePageHeight();
     const dpr = window.devicePixelRatio || 1;
-    pageCanvas.width = PAGE_W * dpr;
-    pageCanvas.height = pageHeight * dpr;
-    pageCanvas.style.width = PAGE_W + "px";
-    pageCanvas.style.height = pageHeight + "px";
+    const targetWidth = Math.ceil(PAGE_W * dpr);
+    const targetHeight = Math.ceil(pageHeight * dpr);
+    if (pageCanvas.width !== targetWidth || pageCanvas.height !== targetHeight) {
+      pageCanvas.width = targetWidth;
+      pageCanvas.height = targetHeight;
+      pageCanvas.style.width = PAGE_W + "px";
+      pageCanvas.style.height = pageHeight + "px";
+    }
     pageCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     pageCtx.fillStyle = "#fff";
@@ -451,7 +471,7 @@
 
   // Cursor blink
   setInterval(() => {
-    if (document.activeElement === hiddenInput) render();
+    if (document.activeElement === hiddenInput) scheduleRender();
   }, 530);
 
   // --- Settings ---
@@ -474,18 +494,18 @@
       settings[key] = parse(e.target.value);
       document.getElementById(valueId).textContent = e.target.value;
       renderSeed = {};
-      render();
+      scheduleRender();
     });
   });
 
   document.getElementById("text-color").addEventListener("input", (e) => {
     settings.textColor = e.target.value;
-    render();
+    scheduleRender();
   });
 
   document.getElementById("writing-style").addEventListener("change", (e) => {
     settings.writingStyle = e.target.value;
-    render();
+    scheduleRender();
   });
 
   // --- Export ---
@@ -513,7 +533,7 @@
       console.error("Failed to load default charset:", e);
     }
 
-    render();
+    scheduleRender();
     hiddenInput.focus();
   }
 

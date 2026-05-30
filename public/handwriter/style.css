@@ -13,15 +13,20 @@ html, body {
 #editor {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  width: 100%;
   min-height: 100vh;
+  overflow-x: auto;
 }
 
 #page {
   background: #fff;
   cursor: text;
   display: block;
+  flex: 0 0 auto;
   width: 960px;
   max-width: 960px;
+  margin: 0 auto;
 }
 
 #hidden-input {
