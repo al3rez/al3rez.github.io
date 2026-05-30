@@ -1,0 +1,18 @@
+{
+  "name": "Handwriter",
+  "short_name": "Handwriter",
+  "description": "Turn typed text into natural handwriting.",
+  "start_url": "/handwriter/",
+  "scope": "/handwriter/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1000x1000",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
