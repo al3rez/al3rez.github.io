@@ -29,6 +29,7 @@
   let ghostCompletion = "";
   let renderQueued = false;
   let layoutRanges = [];
+  let selectionRects = [];
   let isDraggingSelection = false;
   let selectionAnchor = 0;
   const boundsCache = new WeakMap();
@@ -71,7 +72,7 @@
   const toolbar = document.getElementById("toolbar");
   const selectionTooltip = document.getElementById("selection-tooltip");
   const btnBold = document.getElementById("btn-bold");
-  const btnStrike = document.getElementById("btn-strike");
+  const btnUnderline = document.getElementById("btn-underline");
 
   // --- Focus / selection ---
 
@@ -175,9 +176,9 @@
     toggleWrappedSelection("**");
   });
 
-  btnStrike.addEventListener("click", (e) => {
+  btnUnderline.addEventListener("click", (e) => {
     e.preventDefault();
-    toggleWrappedSelection("~~");
+    toggleWrappedSelection("__");
   });
 
   // Show toolbar on mouse near bottom
@@ -335,6 +336,7 @@
 
     const tokens = parseMarkdown(text);
     layoutRanges = [];
+    selectionRects = [];
     const selStart = Math.min(hiddenInput.selectionStart || 0, hiddenInput.selectionEnd || 0);
     const selEnd = Math.max(hiddenInput.selectionStart || 0, hiddenInput.selectionEnd || 0);
 
@@ -460,6 +462,7 @@
     if (wasUnderline) flushUnderline();
     if (wasStrikethrough) flushStrikethrough();
 
+    drawSelectionHighlights();
     updateSelectionTooltip();
 
     // Draw decoration lines
@@ -538,9 +541,48 @@
     layoutRanges.push(range);
 
     if (selEnd > start && selStart < end) {
-      pageCtx.fillStyle = "rgba(0, 122, 255, 0.16)";
-      pageCtx.fillRect(range.left - 1.5, range.top, range.right - range.left + 3, range.bottom - range.top);
+      const lineKey = Math.round(range.top / 4) * 4;
+      const existing = selectionRects.find(r => r.lineKey === lineKey);
+      if (existing) {
+        existing.left = Math.min(existing.left, range.left);
+        existing.right = Math.max(existing.right, range.right);
+        existing.top = Math.min(existing.top, range.top);
+        existing.bottom = Math.max(existing.bottom, range.bottom);
+      } else {
+        selectionRects.push({
+          lineKey,
+          left: range.left,
+          right: range.right,
+          top: range.top,
+          bottom: range.bottom,
+        });
+      }
     }
+  }
+
+  function drawSelectionHighlights() {
+    if (!selectionRects.length) return;
+    pageCtx.save();
+    pageCtx.fillStyle = "rgba(0, 122, 255, 0.14)";
+    for (const r of selectionRects) {
+      const radius = 4;
+      const x = r.left - 3;
+      const y = r.top;
+      const w = r.right - r.left + 6;
+      const h = r.bottom - r.top;
+      pageCtx.beginPath();
+      pageCtx.moveTo(x + radius, y);
+      pageCtx.lineTo(x + w - radius, y);
+      pageCtx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      pageCtx.lineTo(x + w, y + h - radius);
+      pageCtx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      pageCtx.lineTo(x + radius, y + h);
+      pageCtx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      pageCtx.lineTo(x, y + radius);
+      pageCtx.quadraticCurveTo(x, y, x + radius, y);
+      pageCtx.fill();
+    }
+    pageCtx.restore();
   }
 
   function measureWord(startIdx, scale, spaceW, letterSp) {
