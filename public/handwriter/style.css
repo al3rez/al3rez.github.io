@@ -27,6 +27,9 @@ html, body {
   width: 960px;
   max-width: 960px;
   margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
 #hidden-input {
@@ -37,6 +40,44 @@ html, body {
   height: 0;
   opacity: 0;
   pointer-events: none;
+}
+
+#selection-tooltip {
+  position: fixed;
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: rgba(32, 32, 36, 0.94);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translate(-50%, -8px);
+  pointer-events: none;
+  z-index: 150;
+  transition: opacity 0.12s, transform 0.12s;
+}
+
+#selection-tooltip.visible {
+  opacity: 1;
+  transform: translate(-50%, -14px);
+  pointer-events: auto;
+}
+
+#selection-tooltip button {
+  width: 32px;
+  height: 30px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+#selection-tooltip button:hover {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 /* Toolbar */

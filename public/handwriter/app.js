@@ -28,7 +28,12 @@
   let renderSeed = {};
   let ghostCompletion = "";
   let renderQueued = false;
+  let layoutRanges = [];
+  let isDraggingSelection = false;
   const boundsCache = new WeakMap();
+  const strokeIds = new WeakMap();
+  const glyphCache = new Map();
+  let nextStrokeId = 1;
 
   function parseMarkdown(raw) {
     const tokens = [];
@@ -57,23 +62,87 @@
   }
 
   const pageCanvas = document.getElementById("page");
-  const pageCtx = pageCanvas.getContext("2d");
+  const pageCtx = pageCanvas.getContext("2d", { alpha: false, desynchronized: true });
+  const baseCanvas = document.createElement("canvas");
+  const baseCtx = baseCanvas.getContext("2d", { alpha: false, desynchronized: true });
+  let lastCursorRect = null;
   const hiddenInput = document.getElementById("hidden-input");
   const toolbar = document.getElementById("toolbar");
+  const selectionTooltip = document.getElementById("selection-tooltip");
+  const btnBold = document.getElementById("btn-bold");
 
-  // --- Focus ---
+  // --- Focus / selection ---
 
-  pageCanvas.addEventListener("click", () => hiddenInput.focus());
+  function syncSelectionFromInput() {
+    cursorPos = hiddenInput.selectionStart;
+    updateSelectionTooltip();
+    scheduleRender();
+  }
+
+  function canvasPointFromEvent(e) {
+    const rect = pageCanvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (PAGE_W / rect.width),
+      y: (e.clientY - rect.top) * (pageCanvas.height / (window.devicePixelRatio || 1) / rect.height),
+    };
+  }
+
+  function indexFromCanvasPoint(point) {
+    if (!layoutRanges.length) return 0;
+    let nearest = { index: text.length, dist: Infinity };
+    for (const r of layoutRanges) {
+      const sameLine = point.y >= r.top - settings.lineSpacing * 0.35 && point.y <= r.bottom + settings.lineSpacing * 0.35;
+      const xHit = point.x < (r.left + r.right) / 2 ? r.start : r.end;
+      const dx = point.x < r.left ? r.left - point.x : point.x > r.right ? point.x - r.right : 0;
+      const dy = point.y < r.top ? r.top - point.y : point.y > r.bottom ? point.y - r.bottom : 0;
+      const dist = sameLine ? Math.abs(dx) : Math.hypot(dx, dy);
+      if (dist < nearest.dist) nearest = { index: xHit, dist };
+    }
+    return nearest.index;
+  }
+
+  function setNativeSelection(anchor, focus) {
+    hiddenInput.focus({ preventScroll: true });
+    hiddenInput.setSelectionRange(Math.max(0, Math.min(anchor, text.length)), Math.max(0, Math.min(focus, text.length)));
+    syncSelectionFromInput();
+  }
+
+  pageCanvas.addEventListener("pointerdown", (e) => {
+    const idx = indexFromCanvasPoint(canvasPointFromEvent(e));
+    isDraggingSelection = true;
+    pageCanvas.setPointerCapture(e.pointerId);
+    setNativeSelection(idx, idx);
+    e.preventDefault();
+  });
+
+  pageCanvas.addEventListener("pointermove", (e) => {
+    if (!isDraggingSelection) return;
+    hiddenInput.selectionEnd = indexFromCanvasPoint(canvasPointFromEvent(e));
+    syncSelectionFromInput();
+    e.preventDefault();
+  });
+
+  pageCanvas.addEventListener("pointerup", (e) => {
+    isDraggingSelection = false;
+    updateSelectionTooltip();
+    e.preventDefault();
+  });
 
   hiddenInput.addEventListener("input", () => {
     text = hiddenInput.value;
     cursorPos = hiddenInput.selectionStart;
     ghostCompletion = "";
+    updateSelectionTooltip();
     scheduleRender();
     requestCompletion();
   });
 
   hiddenInput.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
+      e.preventDefault();
+      toggleBoldSelection();
+      return;
+    }
     if (e.key === "Tab" && ghostCompletion) {
       e.preventDefault();
       const before = text.slice(0, cursorPos);
@@ -87,14 +156,13 @@
     }
   });
 
-  hiddenInput.addEventListener("keyup", () => {
-    cursorPos = hiddenInput.selectionStart;
-    scheduleRender();
-  });
+  hiddenInput.addEventListener("keyup", syncSelectionFromInput);
+  hiddenInput.addEventListener("click", syncSelectionFromInput);
+  hiddenInput.addEventListener("select", syncSelectionFromInput);
 
-  hiddenInput.addEventListener("click", () => {
-    cursorPos = hiddenInput.selectionStart;
-    scheduleRender();
+  btnBold.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleBoldSelection();
   });
 
   // Show toolbar on mouse near bottom
@@ -105,6 +173,50 @@
       toolbar.classList.remove("visible");
     }
   });
+
+  function toggleBoldSelection() {
+    const a = hiddenInput.selectionStart;
+    const b = hiddenInput.selectionEnd;
+    if (a === b) return;
+    const start = Math.min(a, b);
+    const end = Math.max(a, b);
+    const selected = text.slice(start, end);
+    const alreadyBold = text.slice(start - 2, start) === "**" && text.slice(end, end + 2) === "**";
+    if (alreadyBold) {
+      text = text.slice(0, start - 2) + selected + text.slice(end + 2);
+      hiddenInput.value = text;
+      hiddenInput.setSelectionRange(start - 2, end - 2);
+    } else {
+      text = text.slice(0, start) + "**" + selected + "**" + text.slice(end);
+      hiddenInput.value = text;
+      hiddenInput.setSelectionRange(start + 2, end + 2);
+    }
+    cursorPos = hiddenInput.selectionStart;
+    renderSeed = {};
+    updateSelectionTooltip();
+    scheduleRender();
+  }
+
+  function updateSelectionTooltip() {
+    const start = Math.min(hiddenInput.selectionStart || 0, hiddenInput.selectionEnd || 0);
+    const end = Math.max(hiddenInput.selectionStart || 0, hiddenInput.selectionEnd || 0);
+    if (!selectionTooltip || start === end || !layoutRanges.length) {
+      selectionTooltip?.classList.remove("visible");
+      return;
+    }
+    const selected = layoutRanges.filter(r => r.end > start && r.start < end);
+    if (!selected.length) {
+      selectionTooltip.classList.remove("visible");
+      return;
+    }
+    const rect = pageCanvas.getBoundingClientRect();
+    const top = Math.min(...selected.map(r => r.top));
+    const left = Math.min(...selected.map(r => r.left));
+    const right = Math.max(...selected.map(r => r.right));
+    selectionTooltip.style.left = rect.left + ((left + right) / 2 / PAGE_W) * rect.width + "px";
+    selectionTooltip.style.top = rect.top + (top / (pageCanvas.height / (window.devicePixelRatio || 1))) * rect.height + "px";
+    selectionTooltip.classList.add("visible");
+  }
 
   // --- Autocomplete (disabled — needs better model or API) ---
 
@@ -123,6 +235,19 @@
       renderSeed[index] = seed;
     }
     return samples[seed % samples.length];
+  }
+
+  function getStrokeId(strokes) {
+    let id = strokeIds.get(strokes);
+    if (!id) {
+      id = nextStrokeId++;
+      strokeIds.set(strokes, id);
+    }
+    return id;
+  }
+
+  function clearGlyphCache() {
+    glyphCache.clear();
   }
 
   function getStrokeBounds(strokes) {
@@ -183,6 +308,8 @@
     if (pageCanvas.width !== targetWidth || pageCanvas.height !== targetHeight) {
       pageCanvas.width = targetWidth;
       pageCanvas.height = targetHeight;
+      baseCanvas.width = targetWidth;
+      baseCanvas.height = targetHeight;
       pageCanvas.style.width = PAGE_W + "px";
       pageCanvas.style.height = pageHeight + "px";
     }
@@ -192,6 +319,9 @@
     pageCtx.fillRect(0, 0, PAGE_W, pageHeight);
 
     const tokens = parseMarkdown(text);
+    layoutRanges = [];
+    const selStart = Math.min(hiddenInput.selectionStart || 0, hiddenInput.selectionEnd || 0);
+    const selEnd = Math.max(hiddenInput.selectionStart || 0, hiddenInput.selectionEnd || 0);
 
     let x = MARGIN_LEFT;
     let y = MARGIN_TOP + lineSpacing;
@@ -248,12 +378,16 @@
       }
 
       if (c === " ") {
-        x += spaceW;
+        const w = spaceW;
+        addLayoutRange(i, i + 1, x, y, w, scale, selStart, selEnd);
+        x += w;
         continue;
       }
 
       if (c === "\t") {
-        x += spaceW * 4;
+        const w = spaceW * 4;
+        addLayoutRange(i, i + 1, x, y, w, scale, selStart, selEnd);
+        x += w;
         continue;
       }
 
@@ -275,9 +409,11 @@
         const drawX = x - bounds.minX * scale;
         const drawY = y + lineOffset - BASELINE_REF * scale;
 
+        addLayoutRange(i, i + 1, x, y, bounds.width * scale, scale, selStart, selEnd);
+
         const boldFactor = tok.bold ? 1.5 : 1.0;
-        drawCharacter(pageCtx, strokes, drawX, drawY, scale,
-          charset.forceMultiplier * boldFactor, textColor, writingStyle);
+        drawGlyph(pageCtx, strokes, drawX, drawY, scale,
+          charset.forceMultiplier * boldFactor, textColor, writingStyle, 1.0);
 
         const charW = bounds.width * scale;
         const charMidX = x + charW * 0.5;
@@ -309,6 +445,8 @@
     if (wasUnderline) flushUnderline();
     if (wasStrikethrough) flushStrikethrough();
 
+    updateSelectionTooltip();
+
     // Draw decoration lines
     for (const line of decorationLines) {
       pageCtx.strokeStyle = textColor;
@@ -335,12 +473,7 @@
     const cursorTop = cursorBaseY + 20 * scale;
     const cursorHeight = 180 * scale;
 
-    if (document.activeElement === hiddenInput) {
-      if (Math.floor(Date.now() / 530) % 2 === 0) {
-        pageCtx.fillStyle = textColor;
-        pageCtx.fillRect(cursorX, cursorTop, 1.5, cursorHeight);
-      }
-    }
+    lastCursorRect = { x: cursorX, y: cursorTop, w: 1.5, h: cursorHeight, color: textColor };
 
     // Ghost autocomplete: render predicted text at low opacity after cursor
     if (ghostCompletion && cursorPos === text.length) {
@@ -355,13 +488,43 @@
           const gBounds = getStrokeBounds(gStrokes);
           const gDrawX = gx - gBounds.minX * scale;
           const gDrawY = gy + gLineOffset - BASELINE_REF * scale;
-          drawCharacter(pageCtx, gStrokes, gDrawX, gDrawY, scale,
+          drawGlyph(pageCtx, gStrokes, gDrawX, gDrawY, scale,
             charset.forceMultiplier, ghostColor, writingStyle, 0.35);
           gx += gBounds.width * scale + letterSp;
         } else {
           gx += spaceW;
         }
       }
+    }
+
+    snapshotBase();
+    drawCursorOverlay();
+  }
+
+  function snapshotBase() {
+    baseCtx.setTransform(1, 0, 0, 1, 0, 0);
+    baseCtx.drawImage(pageCanvas, 0, 0);
+  }
+
+  function drawCursorOverlay() {
+    pageCtx.setTransform(1, 0, 0, 1, 0, 0);
+    pageCtx.drawImage(baseCanvas, 0, 0);
+    pageCtx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+    if (document.activeElement === hiddenInput && lastCursorRect && Math.floor(Date.now() / 530) % 2 === 0) {
+      pageCtx.fillStyle = lastCursorRect.color;
+      pageCtx.fillRect(lastCursorRect.x, lastCursorRect.y, lastCursorRect.w, lastCursorRect.h);
+    }
+  }
+
+  function addLayoutRange(start, end, x, y, width, scale, selStart, selEnd) {
+    const top = y - BASELINE_REF * scale + 14 * scale;
+    const bottom = y - BASELINE_REF * scale + 205 * scale;
+    const range = { start, end, left: x, right: x + Math.max(width, 3), top, bottom };
+    layoutRanges.push(range);
+
+    if (selEnd > start && selStart < end) {
+      pageCtx.fillStyle = "rgba(0, 122, 255, 0.16)";
+      pageCtx.fillRect(range.left - 1.5, range.top, range.right - range.left + 3, range.bottom - range.top);
     }
   }
 
@@ -437,6 +600,40 @@
     return Math.max(600, MARGIN_TOP + (lines + 2) * lineSpacing + 80);
   }
 
+  function drawGlyph(ctx, strokes, offsetX, offsetY, scale, thicknessFactor, color, style, opacity) {
+    const dpr = window.devicePixelRatio || 1;
+    const bounds = getStrokeBounds(strokes);
+    const pad = Math.ceil(10 * scale + 4);
+    const w = Math.max(1, Math.ceil(bounds.width * scale + pad * 2));
+    const h = Math.max(1, Math.ceil(bounds.height * scale + pad * 2));
+    const alpha = opacity === undefined ? 1 : opacity;
+    const key = [getStrokeId(strokes), scale.toFixed(4), thicknessFactor.toFixed(3), color, style, alpha.toFixed(2), dpr].join("|");
+    let cached = glyphCache.get(key);
+
+    if (!cached) {
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.ceil(w * dpr);
+      canvas.height = Math.ceil(h * dpr);
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      const cctx = canvas.getContext("2d", { alpha: true });
+      cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawCharacter(cctx, strokes, pad - bounds.minX * scale, pad - bounds.minY * scale, scale, thicknessFactor, color, style, alpha);
+      cached = { canvas, x: bounds.minX * scale - pad, y: bounds.minY * scale - pad, lastUsed: performance.now() };
+      glyphCache.set(key, cached);
+
+      // Hard cap: enough for all visible variants, prevents mobile memory blowups.
+      if (glyphCache.size > 900) {
+        const doomed = glyphCache.keys().next().value;
+        glyphCache.delete(doomed);
+      }
+    } else {
+      cached.lastUsed = performance.now();
+    }
+
+    ctx.drawImage(cached.canvas, offsetX + cached.x, offsetY + cached.y, w, h);
+  }
+
   function drawCharacter(ctx, strokes, offsetX, offsetY, scale, thicknessFactor, color, style, opacity) {
     const baseOpacity = opacity !== undefined ? opacity : 1.0;
     ctx.lineCap = "round";
@@ -469,9 +666,9 @@
     ctx.globalAlpha = 1.0;
   }
 
-  // Cursor blink
+  // Cursor blink: redraw only the tiny overlay, not the whole page/layout.
   setInterval(() => {
-    if (document.activeElement === hiddenInput) scheduleRender();
+    if (document.activeElement === hiddenInput && lastCursorRect) drawCursorOverlay();
   }, 530);
 
   // --- Settings ---
@@ -494,17 +691,20 @@
       settings[key] = parse(e.target.value);
       document.getElementById(valueId).textContent = e.target.value;
       renderSeed = {};
+      clearGlyphCache();
       scheduleRender();
     });
   });
 
   document.getElementById("text-color").addEventListener("input", (e) => {
     settings.textColor = e.target.value;
+    clearGlyphCache();
     scheduleRender();
   });
 
   document.getElementById("writing-style").addEventListener("change", (e) => {
     settings.writingStyle = e.target.value;
+    clearGlyphCache();
     scheduleRender();
   });
 
