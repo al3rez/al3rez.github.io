@@ -30,6 +30,7 @@
   let renderQueued = false;
   let layoutRanges = [];
   let isDraggingSelection = false;
+  let selectionAnchor = 0;
   const boundsCache = new WeakMap();
   const strokeIds = new WeakMap();
   const glyphCache = new Map();
@@ -70,6 +71,7 @@
   const toolbar = document.getElementById("toolbar");
   const selectionTooltip = document.getElementById("selection-tooltip");
   const btnBold = document.getElementById("btn-bold");
+  const btnStrike = document.getElementById("btn-strike");
 
   // --- Focus / selection ---
 
@@ -101,15 +103,24 @@
     return nearest.index;
   }
 
+  function clampTextIndex(index) {
+    return Math.max(0, Math.min(index, text.length));
+  }
+
   function setNativeSelection(anchor, focus) {
     hiddenInput.focus({ preventScroll: true });
-    hiddenInput.setSelectionRange(Math.max(0, Math.min(anchor, text.length)), Math.max(0, Math.min(focus, text.length)));
-    syncSelectionFromInput();
+    anchor = clampTextIndex(anchor);
+    focus = clampTextIndex(focus);
+    hiddenInput.setSelectionRange(Math.min(anchor, focus), Math.max(anchor, focus));
+    cursorPos = focus;
+    updateSelectionTooltip();
+    scheduleRender();
   }
 
   pageCanvas.addEventListener("pointerdown", (e) => {
     const idx = indexFromCanvasPoint(canvasPointFromEvent(e));
     isDraggingSelection = true;
+    selectionAnchor = idx;
     pageCanvas.setPointerCapture(e.pointerId);
     setNativeSelection(idx, idx);
     e.preventDefault();
@@ -117,8 +128,7 @@
 
   pageCanvas.addEventListener("pointermove", (e) => {
     if (!isDraggingSelection) return;
-    hiddenInput.selectionEnd = indexFromCanvasPoint(canvasPointFromEvent(e));
-    syncSelectionFromInput();
+    setNativeSelection(selectionAnchor, indexFromCanvasPoint(canvasPointFromEvent(e)));
     e.preventDefault();
   });
 
@@ -140,7 +150,7 @@
   hiddenInput.addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
       e.preventDefault();
-      toggleBoldSelection();
+      toggleWrappedSelection("**");
       return;
     }
     if (e.key === "Tab" && ghostCompletion) {
@@ -162,7 +172,12 @@
 
   btnBold.addEventListener("click", (e) => {
     e.preventDefault();
-    toggleBoldSelection();
+    toggleWrappedSelection("**");
+  });
+
+  btnStrike.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleWrappedSelection("~~");
   });
 
   // Show toolbar on mouse near bottom
@@ -174,22 +189,22 @@
     }
   });
 
-  function toggleBoldSelection() {
+  function toggleWrappedSelection(marker) {
     const a = hiddenInput.selectionStart;
     const b = hiddenInput.selectionEnd;
     if (a === b) return;
     const start = Math.min(a, b);
     const end = Math.max(a, b);
     const selected = text.slice(start, end);
-    const alreadyBold = text.slice(start - 2, start) === "**" && text.slice(end, end + 2) === "**";
-    if (alreadyBold) {
-      text = text.slice(0, start - 2) + selected + text.slice(end + 2);
+    const alreadyWrapped = text.slice(start - marker.length, start) === marker && text.slice(end, end + marker.length) === marker;
+    if (alreadyWrapped) {
+      text = text.slice(0, start - marker.length) + selected + text.slice(end + marker.length);
       hiddenInput.value = text;
-      hiddenInput.setSelectionRange(start - 2, end - 2);
+      hiddenInput.setSelectionRange(start - marker.length, end - marker.length);
     } else {
-      text = text.slice(0, start) + "**" + selected + "**" + text.slice(end);
+      text = text.slice(0, start) + marker + selected + marker + text.slice(end);
       hiddenInput.value = text;
-      hiddenInput.setSelectionRange(start + 2, end + 2);
+      hiddenInput.setSelectionRange(start + marker.length, end + marker.length);
     }
     cursorPos = hiddenInput.selectionStart;
     renderSeed = {};
