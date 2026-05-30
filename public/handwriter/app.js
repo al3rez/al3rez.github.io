@@ -8,10 +8,13 @@
     forceMultiplier: 1.0,
   };
 
+  const systemDarkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
   const settings = {
     fontSize: 1.0,
     lineSpacing: 34,
-    textColor: "#2c2c2e",
+    textColor: systemDarkQuery.matches ? "#f5f5f7" : "#2c2c2e",
+    pageColor: systemDarkQuery.matches ? "#050505" : "#ffffff",
     writingStyle: "pen",
   };
 
@@ -331,7 +334,7 @@
     }
     pageCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    pageCtx.fillStyle = "#fff";
+    pageCtx.fillStyle = settings.pageColor;
     pageCtx.fillRect(0, 0, PAGE_W, pageHeight);
 
     const tokens = parseMarkdown(text);
@@ -752,6 +755,18 @@
       scheduleRender();
     });
   });
+
+  function applySystemTheme() {
+    settings.textColor = systemDarkQuery.matches ? "#f5f5f7" : "#2c2c2e";
+    settings.pageColor = systemDarkQuery.matches ? "#050505" : "#ffffff";
+    document.documentElement.classList.toggle("dark", systemDarkQuery.matches);
+    document.getElementById("text-color").value = settings.textColor;
+    clearGlyphCache();
+    scheduleRender();
+  }
+
+  systemDarkQuery.addEventListener?.("change", applySystemTheme);
+  applySystemTheme();
 
   document.getElementById("text-color").addEventListener("input", (e) => {
     settings.textColor = e.target.value;
